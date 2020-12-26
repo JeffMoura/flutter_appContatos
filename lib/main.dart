@@ -1,7 +1,16 @@
+//Dependências instaladas no pubspec.yaml
+/*sqflite: ^1.1.5
+url_launcher: ^5.0.2
+image_picker: ^0.6.0+3 */
+
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(Home()
+  runApp(MaterialApp(
+    home: Home(
+      
+    ),
+  )
   );
 }
 
