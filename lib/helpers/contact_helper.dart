@@ -18,7 +18,7 @@ class Contact {
   String phone;
   String img;
 
-  //retorna os dados do map para os contatos da 'Classe Contact'
+  //Construtor que retorna os dados do map para construir os contatos da 'Classe Contact'
   Contact.fromMap(Map map) {
     id = map[idColumn];
     name = map[nameColumn];
@@ -27,13 +27,25 @@ class Contact {
     img = map[imgColumn];
   }
 
-  //Faz o inverso, transformando os dados da 'classe Contact' para mapa
+  //Função que Faz o inverso, transformando os dados da 'classe Contact' para map
   Map toMap() {
     Map<String, dynamic> map = {
       nameColumn: name,
       emailColumn: email,
       phoneColumn: phone,
       imgColumn: img
+      //não há o campo id, porque o próprio banco de dados vai gerar
     };
+    //caso o id seja nulo, então será adicionado o id no map idcolumn
+    if (id != null) {
+      map[idColumn] = id;
+    }
+    return map;
+  }
+
+  @override 
+  //caso haja necessidade de printar as informações do contato de maneira mais intuitiva é só chamar a função abaixo
+  String toString() {
+    return "Contact(id: $id, name: $name, email: $email, phone: $phone, img: $img)";
   }
 }
