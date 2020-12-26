@@ -56,6 +56,40 @@ class ContactHelper {
           "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT, $phoneColumn TEXT, $imgColumn TEXT)");
     });
   }
+
+  //-----------------------------------------------------------------------------------------------------------------------
+  //FUNÇÃO SALVAR O CONTATO
+  //chama o 'save contact' para salvar o contato, e passar o contato que queremos
+  Future<Contact> saveContact(Contact contact) async {
+    Database dbContact = await db; //obter o banco de dados
+    contact.id = await dbContact.insert(contactTable,
+        contact.toMap()); // pedir para inserir o contato na tabela do BD
+    return contact; //retorna o contato no FUTURO porque é uma função assíncrona
+  }
+
+  //-----------------------------------------------------------------------------------------------------------------------
+  //FUNÇÃO OBTER DADOS DE UM CONTATO
+  //Como o banco dados as coisas não acontecem instantaneamente, utilizamos o 'future'
+  Future<Contact> getContact(int id) async {
+    //a função recebe o id do contato
+    Database dbContact = await db; //obter o banco de dados
+    List<Map> maps = await dbContact.query(
+        //retorna uma lista de mapas, obtendo com uma query os dados específicos de um contato
+        contactTable,
+        columns: [idColumn, nameColumn, emailColumn, phoneColumn, imgColumn],
+        where: "$idColumn = ?", //pega o contato onde o 'idColumn' = argumento
+        whereArgs: [id]); //argumento id passado como parâmetro
+
+        //verificar se realmente retornou um contato
+        if(maps.length > 0){ //se a lista tiver ao menos um elemento
+          return Contact.fromMap(maps.first); //retorna um contato, pegando o primeiro 'fist'
+        }else{ //senão, ele retorna um null
+          return null;
+        }
+  }
+
+  //------------------------------------------------------------------------------------------------------------------------
+  
 }
 
 //=========================================================================================================================
