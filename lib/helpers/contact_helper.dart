@@ -1,15 +1,64 @@
+import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 //Criar as colunas do BD: id, name, email, phone, img
 
+final String contactTable = "contactTable"; //nome da tabela
 final String idColumn = "idColumn";
 final String nameColumn = "nameColumn";
 final String emailColumn = "emailColumn";
 final String phoneColumn = "phoneColumn";
 final String imgColumn = "imgColumn";
 
-class ContactHelper {}
+//===========================================================================================================================
+class ContactHelper {
+  //declarando o objeto '_instance' dentro da classe,
+  //e chama o construtor interno 'contacthelper.internal'
+  static final ContactHelper _instance = ContactHelper.internal();
+  factory ContactHelper() => _instance; //
 
+  ContactHelper.internal();
+
+//declarando o banco de dados, que não poderá ser acessado fora dessa classe devido ao '_'
+  Database _db;
+
+//-----------> INICIALIZAR O BANCO DE DADOS
+//Função futura e uma função assíncrona pois não ocorre instantaneamente
+  Future<Database> get db async {
+    if (_db != null) {
+      //se o db for nulo, ou seja, se já estiver inicializado, retorna o banco de dados
+      return _db;
+    } else {
+      //senão, ele chama a função para inicializar o bd 'initDb'
+      _db = await initDb();
+      return _db;
+    }
+  }
+
+//--------------> ARMAZENA O CAMINHO E CRIA O BANCO DE DADOS CASO SEJA A PRIMEIRA VEZ
+
+  //função que é um futuro e retorna um  banco de dados
+  //como não retorna instantaneamente, então utiliza-se a função assíncrona 'async' e o 'await'
+  Future<Database> initDb() async {
+    //local onde vai armazenar o banco de dados
+    final databasesPath =
+        await getDatabasesPath(); //pega o caminho para a pasta de armazenamento do BD
+    final path = join(databasesPath,
+        "contacts.db"); // junta com o nome do banco 'contacts.db' e retorna o caminho 'path'
+
+    //Abrindo o banco de dados
+    return await openDatabase(path,
+        version: 1, //criando o banco de dados pela primeira vez que abre ele
+        onCreate: (Database db, int newerVersion) async {
+      //como não ocorre instanteamente então utiliza-se a função assíncrona 'async' e 'await'
+      await db.execute(
+          //criando a tabela do Banco de Dados, nomeada lá no início 'contactTable'
+          "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT, $phoneColumn TEXT, $imgColumn TEXT)");
+    });
+  }
+}
+
+//=========================================================================================================================
 //A classe vai definir tudo que o contato vai armazenar
 class Contact {
   int id;
@@ -18,6 +67,7 @@ class Contact {
   String phone;
   String img;
 
+//===========================================================================================================================
   //Construtor que retorna os dados do map para construir os contatos da 'Classe Contact'
   Contact.fromMap(Map map) {
     id = map[idColumn];
@@ -27,6 +77,7 @@ class Contact {
     img = map[imgColumn];
   }
 
+//===========================================================================================================================
   //Função que Faz o inverso, transformando os dados da 'classe Contact' para map
   Map toMap() {
     Map<String, dynamic> map = {
@@ -43,7 +94,8 @@ class Contact {
     return map;
   }
 
-  @override 
+//===========================================================================================================================
+  @override
   //caso haja necessidade de printar as informações do contato de maneira mais intuitiva é só chamar a função abaixo
   String toString() {
     return "Contact(id: $id, name: $name, email: $email, phone: $phone, img: $img)";
