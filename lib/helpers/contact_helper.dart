@@ -104,6 +104,7 @@ class ContactHelper {
 
   //------------------ FUNÇÃO ATUALIZzAR UM CONTATO <--------------------------------------------------------------------
 
+  //o Future retorna um número inteiro
   Future<int> updateContact(Contact contact) async {
     Database dbContact = await db; //obtem o banco de dados
     return dbContact.update(contactTable, contact.toMap(),
@@ -114,6 +115,7 @@ class ContactHelper {
   //------------------ FUNÇÃO OBTER TODOS OS CONTATOS <--------------------------------------------------------------------
 
 //como não é instantaneo, utiliza-se o Future, async e await
+  //o future retorna uma lista
   Future<List> getAllContacts() async {
     Database dbContact = await db; //obtem o banco de dados
     //declara uma lista de mapas 'listMap', cada mapa será um contato
@@ -127,7 +129,25 @@ class ContactHelper {
     for (Map m in listMap) {
       listContact.add(Contact.fromMap(m));
     }
-    return listContact;
+    return listContact; //retorna a lista de contatos
+  }
+
+  //------------------ FUNÇÃO OBTER O NÚMERO DE CONTATOS DA LISTA <--------------------------------------------------------------------
+
+  //obtem o número de contatos da tabela
+  Future<int> getNumber() async {
+    Database dbContact = await db; //obtem o bd
+    //retorna a quantidade de elementos da tabela
+    return Sqflite.firstIntValue(
+        //obtem a contagem
+        await dbContact.rawQuery("SELECT COUNT(*) FROM $contactTable")); //
+  }
+
+  //------------------ FUNÇÃO FECHAR O BANCO DE DADOS <--------------------------------------------------------------------
+
+  Future close() async {
+    Database dbContact = await db;
+    dbContact.close();
   }
 }
 
