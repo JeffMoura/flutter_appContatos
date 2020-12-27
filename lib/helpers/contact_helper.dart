@@ -22,7 +22,7 @@ class ContactHelper {
 //declarando o banco de dados, que não poderá ser acessado fora dessa classe devido ao '_'
   Database _db;
 
-//-----------> INICIALIZAR O BANCO DE DADOS
+//----------------------------> INICIALIZAR O BANCO DE DADOS <--------------------------------------------------------------------
 //Função futura e uma função assíncrona pois não ocorre instantaneamente
   Future<Database> get db async {
     if (_db != null) {
@@ -35,7 +35,7 @@ class ContactHelper {
     }
   }
 
-//--------------> ARMAZENA O CAMINHO E CRIA O BANCO DE DADOS CASO SEJA A PRIMEIRA VEZ
+//--------------> ARMAZENA O CAMINHO E CRIA O BANCO DE DADOS CASO SEJA A PRIMEIRA VEZ <--------------------------------------
 
   //função que é um futuro e retorna um  banco de dados
   //como não retorna instantaneamente, então utiliza-se a função assíncrona 'async' e o 'await'
@@ -57,8 +57,8 @@ class ContactHelper {
     });
   }
 
-  //-----------------------------------------------------------------------------------------------------------------------
-  //FUNÇÃO SALVAR O CONTATO
+  //------------------------> FUNÇÃO SALVAR O CONTATO <--------------------------------------------------------------------
+
   //chama o 'save contact' para salvar o contato, e passar o contato que queremos
   Future<Contact> saveContact(Contact contact) async {
     Database dbContact = await db; //obter o banco de dados
@@ -67,8 +67,8 @@ class ContactHelper {
     return contact; //retorna o contato no FUTURO porque é uma função assíncrona
   }
 
-  //-----------------------------------------------------------------------------------------------------------------------
-  //FUNÇÃO OBTER DADOS DE UM CONTATO
+  //-------------------------FUNÇÃO OBTER DADOS DE UM CONTATO <------------------------------------------------------------
+
   //Como o banco dados as coisas não acontecem instantaneamente, utilizamos o 'future'
   Future<Contact> getContact(int id) async {
     //a função recebe o id do contato
@@ -80,16 +80,55 @@ class ContactHelper {
         where: "$idColumn = ?", //pega o contato onde o 'idColumn' = argumento
         whereArgs: [id]); //argumento id passado como parâmetro
 
-        //verificar se realmente retornou um contato
-        if(maps.length > 0){ //se a lista tiver ao menos um elemento
-          return Contact.fromMap(maps.first); //retorna um contato, pegando o primeiro 'fist'
-        }else{ //senão, ele retorna um null
-          return null;
-        }
+    //verificar se realmente retornou um contato
+    if (maps.length > 0) {
+      //se a lista tiver ao menos um elemento
+      return Contact.fromMap(
+          maps.first); //retorna um contato, pegando o primeiro 'fist'
+    } else {
+      //senão, ele retorna um null
+      return null;
+    }
   }
 
-  //------------------------------------------------------------------------------------------------------------------------
-  
+  //------------------ FUNÇÃO DELETAR UM CONTATO <--------------------------------------------------------------------
+
+  //informar o id do contato que será deletado
+  //Como a exclusão não ocorre instantaneamente (assíncrona), utiliza-se o Future await, tanto no 'await db', quanto 'return await'
+  Future<int> deleteContact(int id) async {
+    Database dbContact = await db; //obtem o banco de dados
+    return await dbContact
+        .delete(contactTable, where: "$idColumn = ?", whereArgs: [id]);
+    //retorna um número inteiro se a exclusão foi um sucesso ou não, por isso utiliza-se o Future<int>
+  }
+
+  //------------------ FUNÇÃO ATUALIZzAR UM CONTATO <--------------------------------------------------------------------
+
+  Future<int> updateContact(Contact contact) async {
+    Database dbContact = await db; //obtem o banco de dados
+    return dbContact.update(contactTable, contact.toMap(),
+        where: "$idColumn = ?",
+        whereArgs: [contact.id]); //passa o id do contato, conforme o parâmetro
+  }
+
+  //------------------ FUNÇÃO OBTER TODOS OS CONTATOS <--------------------------------------------------------------------
+
+//como não é instantaneo, utiliza-se o Future, async e await
+  Future<List> getAllContacts() async {
+    Database dbContact = await db; //obtem o banco de dados
+    //declara uma lista de mapas 'listMap', cada mapa será um contato
+    List listMap = await dbContact.rawQuery(
+        "SELECT * FROM $contactTable"); //seleciona todos os elementos da tabela
+    //como o mapa não é um contato, é preciso transformar a lista de mapas em lista de contatos
+    //declara uma lista de contatos 'listContact'
+    List<Contact> listContact = List(); //especifica uma lista do tipo 'Contact'
+
+    //Pega cada um dos mapas da 'listMap', transforma em contato, e adiciona na 'listContact'.
+    for (Map m in listMap) {
+      listContact.add(Contact.fromMap(m));
+    }
+    return listContact;
+  }
 }
 
 //=========================================================================================================================
