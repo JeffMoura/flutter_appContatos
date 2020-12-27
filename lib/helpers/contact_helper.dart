@@ -11,6 +11,8 @@ final String phoneColumn = "phoneColumn";
 final String imgColumn = "imgColumn";
 
 //===========================================================================================================================
+
+//essa classe só irá possuir um objeto, por isso o 'static final'.
 class ContactHelper {
   //declarando o objeto '_instance' dentro da classe,
   //e chama o construtor interno 'contacthelper.internal'
@@ -44,7 +46,7 @@ class ContactHelper {
     final databasesPath =
         await getDatabasesPath(); //pega o caminho para a pasta de armazenamento do BD
     final path = join(databasesPath,
-        "contacts.db"); // junta com o nome do banco 'contacts.db' e retorna o caminho 'path'
+        "contactsnew.db"); // junta com o nome do banco 'contacts.db' e retorna o caminho 'path'
 
     //Abrindo o banco de dados
     return await openDatabase(path,
@@ -102,7 +104,7 @@ class ContactHelper {
     //retorna um número inteiro se a exclusão foi um sucesso ou não, por isso utiliza-se o Future<int>
   }
 
-  //------------------ FUNÇÃO ATUALIZzAR UM CONTATO <--------------------------------------------------------------------
+  //------------------ FUNÇÃO ATUALIZAR UM CONTATO <--------------------------------------------------------------------
 
   //o Future retorna um número inteiro
   Future<int> updateContact(Contact contact) async {
@@ -159,6 +161,10 @@ class Contact {
   String email;
   String phone;
   String img;
+
+//==========================================================================================================================
+//Construtor vazio
+  Contact();
 
 //===========================================================================================================================
   //Construtor que retorna os dados do map para construir os contatos da 'Classe Contact'
